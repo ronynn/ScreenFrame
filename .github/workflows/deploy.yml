@@ -6,29 +6,32 @@ on:
       - main  # Change this if your default branch is different
 
 permissions:
-  contents: read
+  contents: write  # Ensure this is explicitly set
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false  # Important for custom authentication
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 18
           cache: npm
 
       - name: Install dependencies
         run: npm install
 
       - name: Build project
-        run: npm run build
+        run: NODE_OPTIONS=--openssl-legacy-provider npm run build
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
           folder: build
+          token: ${{ secrets.GITHUB_TOKEN }}
